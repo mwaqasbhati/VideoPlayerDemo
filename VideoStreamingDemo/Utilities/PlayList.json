@@ -1,0 +1,35 @@
+{
+  "data":[
+     {
+       "name": "Test Name",
+       "description": "some dummy description",
+       "url": "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8",
+       "thumbnail": "1"
+     },
+    {
+       "name": "Test Name",
+       "description": "some dummy description",
+       "url": "https://content.jwplatform.com/manifests/yp34SRmf.m3u8",
+       "thumbnail": "2"
+     },
+    {
+       "name": "Test Name",
+       "description": "some dummy description",
+       "url": "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
+       "thumbnail": "3"
+     },
+    {
+       "name": "Test Name",
+       "description": "some dummy description",
+       "url": "https://mnmedias.api.telequebec.tv/m3u8/29880.m3u8",
+       "thumbnail": "4"
+     },
+    {
+       "name": "Test Name",
+       "description": "some dummy description",
+       "url": "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8",
+       "thumbnail": "5"
+     }
+  ]
+}
+
