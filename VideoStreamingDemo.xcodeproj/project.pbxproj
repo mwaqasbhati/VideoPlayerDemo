@@ -8,12 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		250109792393B8240083F142 /* VideoUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 250109782393B8240083F142 /* VideoUtility.swift */; };
-		2501097C2393BF590083F142 /* VideoOverlay.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2501097B2393BF590083F142 /* VideoOverlay.xib */; };
 		2501097E23945CF00083F142 /* VideoCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2501097D23945CF00083F142 /* VideoCell.xib */; };
 		25010981239517F30083F142 /* CMTime+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25010980239517F30083F142 /* CMTime+extension.swift */; };
 		25010983239528160083F142 /* VideoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25010982239528160083F142 /* VideoCollectionViewCell.swift */; };
 		25010986239548290083F142 /* AVPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25010985239548290083F142 /* AVPlayerView.swift */; };
 		25010988239553BF0083F142 /* UIView+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25010987239553BF0083F142 /* UIView+extension.swift */; };
+		2501098B2395C0630083F142 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2501098A2395C0630083F142 /* Reachability.swift */; };
 		255763A823931DEE00F6D465 /* VideoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 255763A723931DEE00F6D465 /* VideoTableViewCell.swift */; };
 		255763AA23931FDE00F6D465 /* VideoDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 255763A923931FDE00F6D465 /* VideoDetailViewController.swift */; };
 		2588813223904B8300127C6E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2588813123904B8300127C6E /* AppDelegate.swift */; };
@@ -49,12 +49,12 @@
 
 /* Begin PBXFileReference section */
 		250109782393B8240083F142 /* VideoUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoUtility.swift; sourceTree = "<group>"; };
-		2501097B2393BF590083F142 /* VideoOverlay.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VideoOverlay.xib; sourceTree = "<group>"; };
 		2501097D23945CF00083F142 /* VideoCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VideoCell.xib; sourceTree = "<group>"; };
 		25010980239517F30083F142 /* CMTime+extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CMTime+extension.swift"; sourceTree = "<group>"; };
 		25010982239528160083F142 /* VideoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCollectionViewCell.swift; sourceTree = "<group>"; };
 		25010985239548290083F142 /* AVPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVPlayerView.swift; sourceTree = "<group>"; };
 		25010987239553BF0083F142 /* UIView+extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+extension.swift"; sourceTree = "<group>"; };
+		2501098A2395C0630083F142 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		255763A723931DEE00F6D465 /* VideoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoTableViewCell.swift; sourceTree = "<group>"; };
 		255763A923931FDE00F6D465 /* VideoDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDetailViewController.swift; sourceTree = "<group>"; };
 		2588812E23904B8300127C6E /* VideoStreamingDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VideoStreamingDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -105,7 +105,6 @@
 		2501097A2393BF2F0083F142 /* Xibs */ = {
 			isa = PBXGroup;
 			children = (
-				2501097B2393BF590083F142 /* VideoOverlay.xib */,
 				2501097D23945CF00083F142 /* VideoCell.xib */,
 			);
 			path = Xibs;
@@ -126,6 +125,15 @@
 				25010985239548290083F142 /* AVPlayerView.swift */,
 			);
 			path = AVPlayerView;
+			sourceTree = "<group>";
+		};
+		250109892395BEE40083F142 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				2588813523904B8300127C6E /* VideoListViewController.swift */,
+				255763A923931FDE00F6D465 /* VideoDetailViewController.swift */,
+			);
+			path = ViewControllers;
 			sourceTree = "<group>";
 		};
 		255763A623931DC300F6D465 /* TableViewCells */ = {
@@ -204,11 +212,10 @@
 		2588816223904BB400127C6E /* View */ = {
 			isa = PBXGroup;
 			children = (
+				250109892395BEE40083F142 /* ViewControllers */,
 				25010984239548170083F142 /* AVPlayerView */,
 				2501097A2393BF2F0083F142 /* Xibs */,
-				2588813523904B8300127C6E /* VideoListViewController.swift */,
 				255763A623931DC300F6D465 /* TableViewCells */,
-				255763A923931FDE00F6D465 /* VideoDetailViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -224,6 +231,7 @@
 		2588816423904BC500127C6E /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				2501098A2395C0630083F142 /* Reachability.swift */,
 				2501097F239517DB0083F142 /* Extensions */,
 				2588816C239275DF00127C6E /* PlayList.json */,
 				250109782393B8240083F142 /* VideoUtility.swift */,
@@ -344,7 +352,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2588813E23904B8400127C6E /* LaunchScreen.storyboard in Resources */,
-				2501097C2393BF590083F142 /* VideoOverlay.xib in Resources */,
 				2588813B23904B8400127C6E /* Assets.xcassets in Resources */,
 				2501097E23945CF00083F142 /* VideoCell.xib in Resources */,
 				2588813923904B8300127C6E /* Main.storyboard in Resources */,
@@ -373,6 +380,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2501098B2395C0630083F142 /* Reachability.swift in Sources */,
 				25010986239548290083F142 /* AVPlayerView.swift in Sources */,
 				25010983239528160083F142 /* VideoCollectionViewCell.swift in Sources */,
 				2588813623904B8300127C6E /* VideoListViewController.swift in Sources */,

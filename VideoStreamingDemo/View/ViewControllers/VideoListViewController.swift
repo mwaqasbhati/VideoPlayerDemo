@@ -43,6 +43,7 @@ extension VideoListViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: VideoTableViewCell.cellID) as? VideoTableViewCell else {
             return UITableViewCell()
         }
+        cell.selectionStyle = .none
         cell.setData(viewModel.videos[indexPath.row])
         return cell
     }

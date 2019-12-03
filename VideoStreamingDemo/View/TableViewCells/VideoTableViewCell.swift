@@ -17,6 +17,9 @@ class VideoTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        imageViewThumbnail.layer.masksToBounds = true
+        imageViewThumbnail.layer.cornerRadius = 10.0
+        imageViewThumbnail.contentMode = .scaleAspectFill
     }
 
     func setData(_ video: Video) {

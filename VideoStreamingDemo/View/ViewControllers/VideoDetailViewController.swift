@@ -18,13 +18,21 @@ class VideoDetailViewController: UIViewController {
     @IBOutlet weak var labelDescription: UILabel!
     @IBOutlet weak var buttonBack: UIButton!
     
+    let playerView = AVPlayerView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-               
-      //  self.videoURL = URL(string: viewModel?.videos[viewModel?.selectedIndex ?? 0].url ?? "")
+        setupView()
+        setupAVPlayerView()
+    }
+    private func setupView() {
+        if let selectedIndex = viewModel?.selectedIndex, let video = viewModel?.videos[selectedIndex] {
+            labelTitle.text = video.name
+            labelDescription.text = video.description
+        }
+    }
+    private func setupAVPlayerView() {
         
-        let playerView = AVPlayerView()
         playerView.delegate = self
         containerPlayer.addSubview(playerView)
         playerView.pinEdges(to: containerPlayer)
@@ -34,14 +42,20 @@ class VideoDetailViewController: UIViewController {
         if let selectedIndex = viewModel?.selectedIndex, let urlStr = viewModel?.videos[selectedIndex].url, let url = URL(string: urlStr) {
             playerView.setPlayList(url, items: items, fullView: self.view)
         }
+        
     }
-    
     @IBAction func backButtonPressed(_ sender: Any) {
+        playerView.queuePlayer.removeAllItems()
         navigationController?.popViewController(animated: true)
     }
 }
 
 extension VideoDetailViewController: AVPlayerViewDelegate {
+    func playListItemChanged(_ index: Int) {
+        viewModel?.selectedIndex = index
+        setupView()
+    }
+    
     func resizeAction(_ dimension: AVPlayerView.PLayerDimension) {
         switch dimension {
             case .embed:

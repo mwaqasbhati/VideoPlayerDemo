@@ -16,16 +16,18 @@ struct PlayerItem {
 
 protocol AVPlayerViewDelegate: class {
     func resizeAction(_ dimension: AVPlayerView.PLayerDimension)
+    func playListItemChanged(_ index: Int)
 }
 
 class AVPlayerView: UIView {
     
     
     private var playButton: UIButton!
-    private var queuePlayer: AVQueuePlayer!
+    var queuePlayer: AVQueuePlayer!
     private var playerLayer: AVPlayerLayer!
     private var playerTimeLabel: UILabel!
     private var seekSlider: UISlider!
+    private var activityView = UIActivityIndicatorView(style: .large)
     private var isActive: Bool = false
     private var isShowOverlay: Bool = true
     private var isFullScreen: Bool = false
@@ -36,7 +38,8 @@ class AVPlayerView: UIView {
 
     var playerItems: [PlayerItem]?
     var mainContainerView: UIView?
-    
+    var task: DispatchWorkItem? = nil
+
     var heightConstraint: NSLayoutConstraint?
     var topConstraint: NSLayoutConstraint?
     var delegate: AVPlayerViewDelegate?
@@ -54,8 +57,8 @@ class AVPlayerView: UIView {
         case fullScreen
     }
     
-    var duration: CMTime {
-        return self.queuePlayer.currentItem!.asset.duration
+    var duration: CMTime? {
+        return self.queuePlayer.currentItem?.asset.duration
     }
     override init(frame: CGRect) {
       super.init(frame: frame)
@@ -77,9 +80,7 @@ class AVPlayerView: UIView {
         layoutIfNeeded()
         playerLayer.frame = self.bounds
         mainContainerView = fullView
-        queuePlayer.removeAllItems()
-        let playerItem = AVPlayerItem.init(url: initilURL)
-        queuePlayer.insert(playerItem, after: nil)
+        loadVideo(initilURL)
         collectionView.reloadData()
     }
     private func setupPlayer() {
@@ -94,11 +95,17 @@ class AVPlayerView: UIView {
                 print(cmtime)
                 self?.playerTimeLabel.text = cmtime.description
         })
-        
     }
-    
+    private func loadVideo(_ url: URL) {
+        queuePlayer.removeAllItems()
+        let playerItem = AVPlayerItem.init(url: url)
+        queuePlayer.insert(playerItem, after: nil)
+        playerTimeLabel.text = CMTime.zero.description
+        seekSlider.value = 0.0
+    }
     @objc func changeSeekSlider(_ sender: UISlider) {
-        let seekTime = CMTime(seconds: Double(sender.value) * self.duration.asDouble, preferredTimescale: 100)
+        guard let duration = duration else { return }
+        let seekTime = CMTime(seconds: Double(sender.value) * duration.asDouble, preferredTimescale: 100)
         self.seekToTime(seekTime)
     }
     
@@ -110,12 +117,21 @@ class AVPlayerView: UIView {
     
     private func createPlayerView() {
         queuePlayer = AVQueuePlayer()
+        queuePlayer.addObserver(self, forKeyPath: "timeControlStatus", options: [.old, .new], context: nil)
         playerLayer = AVPlayerLayer(player: queuePlayer)
         playerLayer.backgroundColor = UIColor.black.cgColor
         playerLayer.videoGravity = .resizeAspect
         self.layer.addSublayer(playerLayer)
     }
     private func createOverlayView() {
+        
+        // activity indicator
+        activityView.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(activityView)
+        activityView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        activityView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        activityView.startAnimating()
+        
         // play/pause button
         let playButton = UIButton()
         playButton.translatesAutoresizingMaskIntoConstraints = false
@@ -177,8 +193,8 @@ class AVPlayerView: UIView {
         videosStackView.axis = .horizontal
         videosStackView.translatesAutoresizingMaskIntoConstraints = false
         overlayView.addSubview(videosStackView)
-        videosStackView.leadingAnchor.constraint(equalTo: overlayView.leadingAnchor).isActive = true
-        videosStackView.trailingAnchor.constraint(equalTo: overlayView.trailingAnchor).isActive = true
+        videosStackView.leadingAnchor.constraint(equalTo: overlayView.leadingAnchor, constant: 10).isActive = true
+        videosStackView.trailingAnchor.constraint(equalTo: overlayView.trailingAnchor, constant: -10).isActive = true
         videosStackView.bottomAnchor.constraint(equalTo: self.seekSlider.topAnchor, constant: -10.0).isActive = true
         videosStackView.heightAnchor.constraint(equalToConstant: 100.0).isActive = true
         
@@ -209,8 +225,14 @@ class AVPlayerView: UIView {
     @objc func handleTap(_ sender: UITapGestureRecognizer? = nil) {
         if isShowOverlay {
             overlayView.isHidden = true
+            task?.cancel()
         } else {
             overlayView.isHidden = false
+            task = DispatchWorkItem {
+               self.overlayView.isHidden = true
+               self.isShowOverlay = !self.isShowOverlay
+            }
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(10), execute: task!)
         }
         isShowOverlay = !isShowOverlay
     }
@@ -256,6 +278,22 @@ class AVPlayerView: UIView {
             self.layoutIfNeeded()
         }
     }
+    
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "timeControlStatus", let change = change, let newValue = change[NSKeyValueChangeKey.newKey] as? Int, let oldValue = change[NSKeyValueChangeKey.oldKey] as? Int {
+            let oldStatus = AVPlayer.TimeControlStatus(rawValue: oldValue)
+            let newStatus = AVPlayer.TimeControlStatus(rawValue: newValue)
+            if newStatus != oldStatus {
+                DispatchQueue.main.async {[weak self] in
+                    if newStatus == .playing || newStatus == .paused {
+                        self?.activityView.isHidden = true
+                    } else {
+                        self?.activityView.isHidden = false
+                    }
+                }
+            }
+        }
+    }
 }
 
 extension AVPlayerView: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -272,11 +310,8 @@ extension AVPlayerView: UICollectionViewDelegate, UICollectionViewDataSource {
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let url = URL(string: playerItems?[indexPath.row].url ?? "") {
-            queuePlayer.removeAllItems()
-            let playerItem = AVPlayerItem.init(url: url)
-            queuePlayer.insert(playerItem, after: nil)
-            playerTimeLabel.text = CMTime.zero.description
-            seekSlider.value = 0.0
+            loadVideo(url)
+            delegate?.playListItemChanged(indexPath.row)
         }
     }
 }
