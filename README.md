@@ -1,13 +1,5 @@
 # VideoPlayerDemo
 
-## Demonstrations
-
-Covers the following:
-* Screenshots
-* Requirements
-* Architecture 
-* Code Structure
-
 
 ## Screenshots
 
