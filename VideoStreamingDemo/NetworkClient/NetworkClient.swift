@@ -13,6 +13,7 @@ import Combine
 enum APIError: LocalizedError {
     case urlNotFound
     case statusCode
+    case noNetwork
     
     var localizedDescription: String {
         switch self {
@@ -20,20 +21,21 @@ enum APIError: LocalizedError {
             return "Please provide url."
         case .statusCode:
             return "Response status code is invalid."
-        default:
-            return "Some unknown error occur, please try again later."
+        case .noNetwork:
+            return "Network connectivity issue."
         }
     }
 }
 
 protocol APIManagable {
     func buildURLRequest(_ url: String, params: [String: String]) throws -> URLRequest
-    func fetch<T: Codable>(_ request: URLRequest, value: T.Type, completion: (_ response: Any?, _ error: APIError?)->())
+    func fetch<T: Codable>(_ request: URLRequest, value: T.Type, completion: (_ response: Any?, _ error: APIError?)->()) -> AnyCancellable
 }
 
 extension APIManagable {
     
     func buildURLRequest(_ url: String, params: [String : String]) throws -> URLRequest {
+        guard Reachability.isConnectedToNetwork() else { throw APIError.noNetwork }
         guard let url = URL(string: url) else { throw APIError.urlNotFound }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -42,17 +44,16 @@ extension APIManagable {
             print("URL :\(url)")
             print("Request :\(params)")
         } catch let error {
-            throw error
             print(error.localizedDescription)
+            throw error
         }
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("application/json", forHTTPHeaderField: "Accept")
         return request
     }
     
-    func fetch<T: Codable>(_ request: URLRequest, value: T.Type, completion: (_ response: Any?, _ error: APIError?)->()) {
-        var cancellable: AnyCancellable? = nil
-        cancellable = URLSession.shared.dataTaskPublisher(for: request)
+    func fetch<T: Codable>(_ request: URLRequest, value: T.Type, completion: (_ response: Any?, _ error: APIError?)->()) -> AnyCancellable {
+        let cancellable: AnyCancellable = URLSession.shared.dataTaskPublisher(for: request)
         .tryMap { output in
             guard let response = output.response as? HTTPURLResponse, response.statusCode == 200 else {
                 throw APIError.statusCode
@@ -71,7 +72,7 @@ extension APIManagable {
         }, receiveValue: { posts in
             //print(posts.count)
         })
-        
+        return cancellable
     }
 }
 
@@ -128,11 +129,11 @@ protocol VideoManagable {
     func getVideos(url: String, params: [String: String], completion: (_ response: [Video]?, _ error: APIError?)->())
 }
 
-struct VideoOnlineManager: VideoManagable, APIManagable {
+struct VideoOnlineManager: VideoManagable, APIManagable {    
     func getVideos(url: String, params: [String: String], completion: (_ response: [Video]?, _ error: APIError?)->()) {
         do {
             let request = try buildURLRequest(url, params: params)
-            fetch(request, value: Video.self, completion: completion as! (Any?, APIError?) -> ())
+            let _: AnyCancellable = fetch(request, value: Video.self, completion: completion as! (Any?, APIError?) -> ())
         } catch {
             completion([Video](), error as? APIError)
         }
@@ -146,8 +147,7 @@ struct VideoOfflineManager: VideoManagable {
                   let data = try Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
                   let jsonResult = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
                   print(jsonResult)
-                  if let jsonResult = jsonResult as? Dictionary<String, AnyObject> {
-                            // do stuff
+                if jsonResult is Dictionary<String, AnyObject> {
                     let decoder = JSONDecoder()
                     let jsonData = try decoder.decode(ResponseData.self, from: data)
                     completion(jsonData.data, nil)

@@ -23,7 +23,6 @@ class AVPlayerView: UIView {
     
     
     private var playButton: UIButton!
-    var queuePlayer: AVQueuePlayer!
     private var playerLayer: AVPlayerLayer!
     private var playerTimeLabel: UILabel!
     private var seekSlider: UISlider!
@@ -39,7 +38,7 @@ class AVPlayerView: UIView {
     var playerItems: [PlayerItem]?
     var mainContainerView: UIView?
     var task: DispatchWorkItem? = nil
-
+    var queuePlayer: AVQueuePlayer!
     var heightConstraint: NSLayoutConstraint?
     var topConstraint: NSLayoutConstraint?
     var delegate: AVPlayerViewDelegate?
@@ -128,6 +127,7 @@ class AVPlayerView: UIView {
         // activity indicator
         activityView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(activityView)
+        activityView.color = .white
         activityView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         activityView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
         activityView.startAnimating()

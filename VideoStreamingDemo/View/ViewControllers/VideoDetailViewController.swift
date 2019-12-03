@@ -10,8 +10,6 @@ import UIKit
 import AVKit
 
 class VideoDetailViewController: UIViewController {
-
-    var viewModel: VideoViewModel?
     
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var containerPlayer: UIStackView!
@@ -19,6 +17,7 @@ class VideoDetailViewController: UIViewController {
     @IBOutlet weak var buttonBack: UIButton!
     
     let playerView = AVPlayerView()
+    var viewModel: VideoViewModel?
 
     override func viewDidLoad() {
         super.viewDidLoad()
