@@ -35,6 +35,14 @@ I have created a custom AVPlayerQueue with custom layouts which can run the play
 - UIKit
 - Foundation
 
+## Custom AVPlayerView Functionality
+
+- Play/Pause.
+- Full Screen.
+- More Play List items in full Screen.
+- show/hide of verlay using tap.
+- Timer of the video.
+
 ## Build
 
 To build using xcodebuild without code signing
