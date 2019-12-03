@@ -27,6 +27,14 @@ Covers the following:
 I have used MVVM desigsn pattern in this project. I have made a network manager which will get video play list from local/remote store. currently we are getting it from local storage.
 I have created a custom AVPlayerQueue with custom layouts which can run the player as embedded or in a full screen. I have used Combine framework for observing properties.
 
+## Framework Used
+
+- Combine
+- AVFoundation
+- AVKit
+- UIKit
+- Foundation
+
 ## Build
 
 To build using xcodebuild without code signing
