@@ -15,13 +15,16 @@ struct PlayerItem {
 }
 
 protocol AVPlayerViewDelegate: class {
-    func resizeAction(_ dimension: AVPlayerView.PLayerDimension)
-    func playListItemChanged(_ index: Int)
+    func avPlayerView(_ playerView: AVPlayerView, resizeAction dimension: AVPlayerView.PLayerDimension)
+    func avPlayerView(_ playerView: AVPlayerView, playListItemChanged index: Int)
 }
 
 class AVPlayerView: UIView {
     
-    
+    // MARK: - Constants
+
+    // MARK: - Instance Variables
+
     private var playButton: UIButton!
     private var playerLayer: AVPlayerLayer!
     private var playerTimeLabel: UILabel!
@@ -31,17 +34,16 @@ class AVPlayerView: UIView {
     private var isShowOverlay: Bool = true
     private var isFullScreen: Bool = false
     private var dimension: PLayerDimension = .embed
-
+    private var playerItems: [PlayerItem]?
+    private var mainContainerView: UIView?
+    private var task: DispatchWorkItem? = nil
+    private var heightConstraint: NSLayoutConstraint?
+    private var topConstraint: NSLayoutConstraint?
+    
     let overlayView = UIView()
     let videosStackView = UIStackView()
-
-    var playerItems: [PlayerItem]?
-    var mainContainerView: UIView?
-    var task: DispatchWorkItem? = nil
-    var queuePlayer: AVQueuePlayer!
-    var heightConstraint: NSLayoutConstraint?
-    var topConstraint: NSLayoutConstraint?
     var delegate: AVPlayerViewDelegate?
+    var queuePlayer: AVQueuePlayer!
     
     lazy var collectionView: UICollectionView =  {
         let layout = UICollectionViewFlowLayout()
@@ -59,6 +61,9 @@ class AVPlayerView: UIView {
     var duration: CMTime? {
         return self.queuePlayer.currentItem?.asset.duration
     }
+    
+    // MARK: - View Initializers
+
     override init(frame: CGRect) {
       super.init(frame: frame)
       setupPlayer()
@@ -67,6 +72,9 @@ class AVPlayerView: UIView {
         super.init(coder: coder)
         setupPlayer()
     }
+    
+    // MARK: - Helper Methods
+
     func setPlayList(_ initilURL: URL, items: [PlayerItem], fullView: UIView? = nil) {
         translatesAutoresizingMaskIntoConstraints = false
         heightConstraint = heightAnchor.constraint(equalToConstant: 400.0)
@@ -101,11 +109,6 @@ class AVPlayerView: UIView {
         queuePlayer.insert(playerItem, after: nil)
         playerTimeLabel.text = CMTime.zero.description
         seekSlider.value = 0.0
-    }
-    @objc func changeSeekSlider(_ sender: UISlider) {
-        guard let duration = duration else { return }
-        let seekTime = CMTime(seconds: Double(sender.value) * duration.asDouble, preferredTimescale: 100)
-        self.seekToTime(seekTime)
     }
     
     private func seekToTime(_ seekTime: CMTime) {
@@ -222,6 +225,14 @@ class AVPlayerView: UIView {
         
     }
     
+    // MARK: - Actions
+    
+    @objc func changeSeekSlider(_ sender: UISlider) {
+        guard let duration = duration else { return }
+        let seekTime = CMTime(seconds: Double(sender.value) * duration.asDouble, preferredTimescale: 100)
+        self.seekToTime(seekTime)
+    }
+    
     @objc func handleTap(_ sender: UITapGestureRecognizer? = nil) {
         if isShowOverlay {
             overlayView.isHidden = true
@@ -254,7 +265,7 @@ class AVPlayerView: UIView {
                 heightConstraint?.isActive = true
                 topConstraint?.isActive = true
             }
-            delegate?.resizeAction(dimension)
+            delegate?.avPlayerView(self, resizeAction: dimension)
             layoutIfNeeded()
             playerLayer.frame = bounds
             videosStackView.isHidden = false
@@ -269,7 +280,7 @@ class AVPlayerView: UIView {
                 topConstraint?.isActive = true
             }
             heightConstraint?.isActive = true
-            delegate?.resizeAction(dimension)
+            delegate?.avPlayerView(self, resizeAction: dimension)
             layoutIfNeeded()
             playerLayer.frame = bounds
             videosStackView.isHidden = true
@@ -296,6 +307,8 @@ class AVPlayerView: UIView {
     }
 }
 
+// MARK: - UICollectionView Delegate & Datasource
+
 extension AVPlayerView: UICollectionViewDelegate, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -311,7 +324,7 @@ extension AVPlayerView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let url = URL(string: playerItems?[indexPath.row].url ?? "") {
             loadVideo(url)
-            delegate?.playListItemChanged(indexPath.row)
+            delegate?.avPlayerView(self, playListItemChanged: indexPath.row)
         }
     }
 }

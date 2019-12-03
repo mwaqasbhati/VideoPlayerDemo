@@ -11,22 +11,29 @@ import Combine
 
 class VideoListViewController: UIViewController {
 
-    @IBOutlet weak var tableView: UITableView!
+    // MARK: - Constants
+
+    // MARK: - Instance Variables
     var viewModel = VideoViewModel()
     var cancelable: AnyCancellable?
+
+    // MARK: - IBOutlets
+
+    @IBOutlet weak var tableView: UITableView!
     
+    // MARK: - View Life Cycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
         addObservers()
         viewModel.fetchVideos()
     }
-        
+      
+    // MARK: - Helper Methods
+
     private func addObservers() {
-        
        cancelable = viewModel.onFetchVideo.sink(receiveCompletion: { (error) in
-            
         }) { [weak self] (videos) in
-            //
             guard let `self` = self else { return }
             DispatchQueue.main.async {
                 self.tableView.reloadData()
@@ -34,6 +41,8 @@ class VideoListViewController: UIViewController {
         }
     }
 }
+
+// MARK: - UITableView DataSource
 
 extension VideoListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -49,8 +58,9 @@ extension VideoListViewController: UITableViewDataSource {
     }
 }
 
+// MARK: - UITableView Delegate
+
 extension VideoListViewController: UITableViewDelegate {
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(identifier: "VideoDetailViewControlller") as? VideoDetailViewController {
             viewModel.selectedIndex = indexPath.row

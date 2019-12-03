@@ -11,13 +11,22 @@ import AVKit
 
 class VideoDetailViewController: UIViewController {
     
+    // MARK: - Constants
+
+    // MARK: - Instance Variables
+    
+    let playerView = AVPlayerView()
+    var viewModel: VideoViewModel?
+
+
+    // MARK: - IBOutlets
+
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var containerPlayer: UIStackView!
     @IBOutlet weak var labelDescription: UILabel!
     @IBOutlet weak var buttonBack: UIButton!
     
-    let playerView = AVPlayerView()
-    var viewModel: VideoViewModel?
+    // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,8 +39,10 @@ class VideoDetailViewController: UIViewController {
             labelDescription.text = video.description
         }
     }
+    
+    // MARK: - Helper Methods
+
     private func setupAVPlayerView() {
-        
         playerView.delegate = self
         containerPlayer.addSubview(playerView)
         playerView.pinEdges(to: containerPlayer)
@@ -41,27 +52,30 @@ class VideoDetailViewController: UIViewController {
         if let selectedIndex = viewModel?.selectedIndex, let urlStr = viewModel?.videos[selectedIndex].url, let url = URL(string: urlStr) {
             playerView.setPlayList(url, items: items, fullView: self.view)
         }
-        
     }
+    
+    // MARK: - IBActions
+
     @IBAction func backButtonPressed(_ sender: Any) {
         playerView.queuePlayer.removeAllItems()
         navigationController?.popViewController(animated: true)
     }
 }
 
+// MARK: - AVPlayerViewDelegate
+
 extension VideoDetailViewController: AVPlayerViewDelegate {
-    func playListItemChanged(_ index: Int) {
-        viewModel?.selectedIndex = index
-        setupView()
-    }
-    
-    func resizeAction(_ dimension: AVPlayerView.PLayerDimension) {
+    func avPlayerView(_ playerView: AVPlayerView, resizeAction dimension: AVPlayerView.PLayerDimension) {
         switch dimension {
             case .embed:
                 buttonBack.isHidden = false
             case .fullScreen:
                 buttonBack.isHidden = true
         }
+    }
+    func avPlayerView(_ playerView: AVPlayerView, playListItemChanged index: Int) {
+        viewModel?.selectedIndex = index
+        setupView()
     }
 }
 

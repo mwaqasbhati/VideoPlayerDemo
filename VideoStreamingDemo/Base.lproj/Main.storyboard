@@ -102,7 +102,6 @@
                     <navigationItem key="navigationItem" id="ntF-wV-FRa"/>
                     <connections>
                         <outlet property="tableView" destination="Ye1-uj-LuS" id="NqD-GZ-b4f"/>
-                        <segue destination="XQT-Q4-l26" kind="push" identifier="movieDetail" id="Xdr-3U-z5v"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
