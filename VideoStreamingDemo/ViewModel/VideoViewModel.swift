@@ -13,6 +13,7 @@ import Combine
 class VideoViewModel {
     
     var onFetchVideo = PassthroughSubject<[Video], APIError>()
+    
     var videos: [Video] = [] {
         didSet {
             onFetchVideo.send(videos)

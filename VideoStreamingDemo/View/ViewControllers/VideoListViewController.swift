@@ -65,6 +65,7 @@ extension VideoListViewController: UITableViewDelegate {
         if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(identifier: "VideoDetailViewControlller") as? VideoDetailViewController {
             viewModel.selectedIndex = indexPath.row
             controller.viewModel = viewModel
+            controller.videoDetailViewModel = VideoDetailViewModel()
             navigationController?.pushViewController(controller, animated: true)
         }
     }
